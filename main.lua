@@ -5,7 +5,7 @@ local LibPlugin = {}
 
 local Player = require("scripts/ezlibs-custom/nebulous-liberations/player")
 local Instance = require("scripts/ezlibs-custom/nebulous-liberations/liberations/instance")
-local Parties = require("scripts/libs/parties")
+local Parties = require("scripts/ezlibs-custom/nebulous-liberations/utils/parties")
 
 local waiting_area_map = {}
 
