@@ -186,8 +186,8 @@ local function spawn_item_bot(bot_data, property_animation)
   local shadow_id = Net.create_bot(
     {
       area_id = bot_data.area_id,
-      texture_path = "/server/assets/bots/item.png",
-      animation_path = "/server/assets/bots/item.animation",
+      texture_path = "/server/assets/NebuLibsAssets/bots/item.png",
+      animation_path = "/server/assets/NebuLibsAssets/bots/item.animation",
       animation = "SHADOW",
       warp_in = false,
       x = bot_data.x - 1 / 32,
@@ -215,8 +215,8 @@ end
 function Loot.spawn_item_bot(item, area_id, x, y, z)
   local bot_data = {
     area_id = area_id,
-    texture_path = "/server/assets/bots/item.png",
-    animation_path = "/server/assets/bots/item.animation",
+    texture_path = "/server/assets/NebuLibsAssets/bots/item.png",
+    animation_path = "/server/assets/NebuLibsAssets/bots/item.animation",
     animation = item.animation,
     warp_in = false,
     x = x,
@@ -254,8 +254,8 @@ function Loot.spawn_randomized_item_bot(loot_pool, item_index, area_id, x, y, z)
 
   local bot_data = {
     area_id = area_id,
-    texture_path = "/server/assets/bots/item.png",
-    animation_path = "/server/assets/bots/item.animation",
+    texture_path = "/server/assets/NebuLibsAssets/bots/item.png",
+    animation_path = "/server/assets/NebuLibsAssets/bots/item.animation",
     animation = loot_pool[start_index].animation,
     warp_in = false,
     x = x,

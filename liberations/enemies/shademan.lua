@@ -15,8 +15,8 @@ function ShadeMan:new(instance, position, direction)
     y = math.floor(position.y),
     z = math.floor(position.z),
     mug = {
-      texture_path = "/server/assets/mugs/shademan.png",
-      animation_path = "/server/assets/mugs/shademan.animation",
+      texture_path = "/server/assets/NebuLibsAssets/mugs/shademan.png",
+      animation_path = "/server/assets/NebuLibsAssets/mugs/shademan.animation",
     },
     encounter = "/server/assets/encounters/dependencies/com_Dawn_Shademan.zip",
     selection = EnemySelection:new(instance)
@@ -37,8 +37,8 @@ end
 
 function ShadeMan:spawn(direction)
   self.id = Net.create_bot({
-    texture_path = "/server/assets/bots/shademan.png",
-    animation_path = "/server/assets/bots/shademan.animation",
+    texture_path = "/server/assets/NebuLibsAssets/bots/shademan.png",
+    animation_path = "/server/assets/NebuLibsAssets/bots/shademan.animation",
     area_id = self.instance.area_id,
     direction = direction,
     warp_in = false,

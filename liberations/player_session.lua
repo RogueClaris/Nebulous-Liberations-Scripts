@@ -44,17 +44,17 @@ function PlayerSession:emote_state()
   end
 end
 
-local order_points_mug_texture = "/server/assets/mugs/order pts.png"
+local order_points_mug_texture = "/server/assets/NebuLibsAssets/mugs/order pts.png"
 local order_points_mug_animations = {
-  "/server/assets/mugs/order pts 0.animation",
-  "/server/assets/mugs/order pts 1.animation",
-  "/server/assets/mugs/order pts 2.animation",
-  "/server/assets/mugs/order pts 3.animation",
-  "/server/assets/mugs/order pts 4.animation",
-  "/server/assets/mugs/order pts 5.animation",
-  "/server/assets/mugs/order pts 6.animation",
-  "/server/assets/mugs/order pts 7.animation",
-  "/server/assets/mugs/order pts 8.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 0.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 1.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 2.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 3.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 4.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 5.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 6.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 7.animation",
+  "/server/assets/NebuLibsAssets/mugs/order pts 8.animation",
 }
 
 function PlayerSession:message_with_points(message)
@@ -164,7 +164,7 @@ function PlayerSession:hurt(amount)
     return
   end
 
-  Net.play_sound_for_player(self.player.id, "/server/assets/sound effects/hurt.ogg")
+  Net.play_sound_for_player(self.player.id, "/server/assets/NebuLibsAssets/sound effects/hurt.ogg")
 
   self.health = math.max(math.ceil(self.health - amount), 0)
   ezmemory.set_player_max_health(self.player.id, self.max_health, true)
