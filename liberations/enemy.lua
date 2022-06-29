@@ -23,7 +23,7 @@
 local BlizzardMan = require("scripts/ezlibs-custom/nebulous-liberations/liberations/enemies/blizzardman")
 local BigBrute = require("scripts/ezlibs-custom/nebulous-liberations/liberations/enemies/bigbrute")
 local ShadeMan = require("scripts/ezlibs-custom/nebulous-liberations/liberations/enemies/shademan")
-local ExplodingEffect = require("scripts/utils/exploding_effect")
+local ExplodingEffect = require("scripts/ezlibs-custom/nebulous-liberations/utils/exploding_effect")
 
 local Enemy = {}
 
