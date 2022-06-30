@@ -64,6 +64,7 @@ function ShadeMan:take_turn()
         )
       end
     end
+    Async.await(Async.sleep(0.7))
     local player = EnemyHelpers.find_closest_player_session(self.instance, self)
     if not player then return end --No player. Don't bother.
     local distance = EnemyHelpers.chebyshev_tile_distance(self, player.player.x, player.player.y)
