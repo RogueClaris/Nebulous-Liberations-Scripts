@@ -57,14 +57,17 @@ function ShadeMan:take_turn()
   local co = coroutine.create(function()
     if not debug and self.instance.phase == 1 then
       for _, player in ipairs(self.instance.players) do
-        Async.message_player(player.id,
+        player:message(
           "Heh heh...let's party!",
           self.mug.texture_path,
           self.mug.animation_path
         )
       end
+
+      -- Allow time for the players to read this message
+      Async.await(Async.sleep(3))
     end
-    Async.await(Async.sleep(0.7))
+    
     local player = EnemyHelpers.find_closest_player_session(self.instance, self)
     if not player then return end --No player. Don't bother.
     local distance = EnemyHelpers.chebyshev_tile_distance(self, player.player.x, player.player.y)
