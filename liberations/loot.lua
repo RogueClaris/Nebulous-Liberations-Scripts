@@ -111,6 +111,11 @@ local Loot = {
           Async.await(player_session.player:message_with_mug("But it doesn't open anything..."))
           return
         end
+        local function unlock_gates()
+          for i = 1, #gates, 1 do
+            instance:remove_panel(gates[i])
+          end
+        end
         local id = gates[1].custom_properties["Gate Key"]
         local points = player_session:find_gate_points(id)
         if #points > 0 then
@@ -126,10 +131,10 @@ local Loot = {
               -- Async.await(player_session.player:message_with_mug("The gate opened!"))
               Net.move_player_camera(player_session.player.id, point.x, point.y, point.z, hold_time)
               total_camera_time = total_camera_time + hold_time
-              for i = 1, #gates, 1 do
-                instance:remove_panel(gates[i])
-              end
+              unlock_gates()
             end
+          else
+            unlock_gates()
           end
           total_camera_time = total_camera_time + slide_time
           Net.slide_player_camera(player_session.player.id, player_session.player.x, player_session.player.y, player_session.player.z, slide_time)

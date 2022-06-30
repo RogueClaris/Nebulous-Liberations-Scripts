@@ -57,11 +57,11 @@ function ShadeMan:take_turn()
   local co = coroutine.create(function()
     if not debug and self.instance.phase == 1 then
       for _, player in ipairs(self.instance.players) do
-        Async.await(Async.message_player(player.id,
+        Async.message_player(player.id,
           "Heh heh...let's party!",
           self.mug.texture_path,
           self.mug.animation_path
-        ))
+        )
       end
     end
     local player = EnemyHelpers.find_closest_player_session(self.instance, self)
@@ -71,13 +71,13 @@ function ShadeMan:take_turn()
     self.selection:move(player.player, Direction.None)
     --Message all players.
     for _, players in ipairs(self.instance.players) do
-      Async.await(Async.message_player(players.id,
+      Async.message_player(players.id,
         "Don't underestimate\nthe Darkloids!",
         self.mug.texture_path,
         self.mug.animation_path
-      ))
+      )
     end
-    Async.await(Async.sleep(1))
+    Async.await(Async.sleep(0.7))
     local warp_back_pos = {x=self.x, y=self.y, z=self.z}
     local warp_back_direction = self.direction
     local targetx = player.player.x
