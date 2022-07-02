@@ -427,7 +427,6 @@ function Mission:new(base_area_id, new_area_id, players)
   local desired_players = tonumber(Net.get_area_custom_property(base_area_id, "Target Player Count")) or 3
   local minimum_phases = tonumber(Net.get_area_custom_property(base_area_id, "Minimum Target Phase Count")) or 1
   local player_difference = #players-desired_players
-
   local mission = {
     area_id = new_area_id,
     area_name = Net.get_area_name(base_area_id),
@@ -457,7 +456,8 @@ function Mission:new(base_area_id, new_area_id, players)
     LAST_PANEL_GID = FIRST_PANEL_GID + TOTAL_PANEL_GIDS - 1,
     updating = false,
     needs_disposal = false,
-    disposal_promise = nil
+    disposal_promise = nil,
+    honor_hp_mem = Net.get_area_custom_property(base_area_id, "Honor HPMem") == "true"
   }
   for i = 1, Net.get_layer_count(base_area_id), 1 do
     -- create a layer of panels
@@ -641,7 +641,7 @@ function Mission:begin()
     -- create data
     self.player_sessions[player.id] = PlayerSession:new(self, player)
     local hp = ezmemory.get_player_max_health(player.id)
-    ezmemory.set_player_max_health(player.id, hp, true)
+    ezmemory.set_player_max_health(player.id, hp, self.honor_hp_mem)
     ezmemory.set_player_health(player.id, 99999)
     local start_health = ezmemory.get_player_health(player.id)
     self.player_sessions[player.id].max_health = start_health
