@@ -637,13 +637,21 @@ function Mission:begin()
   local hold_time = .7
   local slide_time = .7
   local total_camera_time = 0
+  local start_health = 0
+  local hp = 0
   for _, player in ipairs(self.players) do
     -- create data
     self.player_sessions[player.id] = PlayerSession:new(self, player)
-    local hp = ezmemory.get_player_max_health(player.id)
-    ezmemory.set_player_max_health(player.id, hp, self.honor_hp_mem)
-    ezmemory.set_player_health(player.id, 99999)
-    local start_health = ezmemory.get_player_health(player.id)
+    if self.honor_hp_mem then
+      hp = ezmemory.get_player_max_health(player.id)
+      ezmemory.set_player_max_health(player.id, hp, self.honor_hp_mem)
+      ezmemory.set_player_health(player.id, 99999)
+      start_health = ezmemory.get_player_health(player.id)
+    else
+      hp = Net.get_player_max_health(player.id)
+      Net.set_player_health(player.id, hp)
+      start_health = hp
+    end
     self.player_sessions[player.id].max_health = start_health
     self.player_sessions[player.id].health = start_health
     if not debug then
