@@ -50,6 +50,7 @@ local function boot_player(player, isVictory, mapName)
 end
 
 local function liberate(self)
+  self.is_liberated = true
   compression.colliders[self.area_id] = nil
   for _, layer in pairs(self.panels) do
     for _, row in pairs(layer) do
@@ -283,7 +284,7 @@ local function take_enemy_turn(self)
           if bossPointFound then
             Net.slide_player_camera(player.id, point.x + .5, point.y + .5, point.z, slide_time)
             Async.sleep(slide_time).and_then(function()
-              player:message_with_mug("Is this the power of Nebula...?").and_then(function()
+              player:message_with_mug("Is this the power of "..point.custom_properties["Spawns"].."...?").and_then(function()
                 boot_player(player, false, self.area_name)
                 Net.unlock_player_camera(player.id)
                 Net.unlock_player_input(player.id)
@@ -457,6 +458,7 @@ function Mission:new(base_area_id, new_area_id, players)
     updating = false,
     needs_disposal = false,
     disposal_promise = nil,
+    is_liberated = false,
     honor_hp_mem = Net.get_area_custom_property(base_area_id, "Honor HPMem") == "true"
   }
   for i = 1, Net.get_layer_count(base_area_id), 1 do
@@ -691,8 +693,8 @@ end
 function Mission:on_tick(elapsed)
   if self.ready_count == #self.players then
     self.ready_count = 0
-    -- now we can take a turn !
-    take_enemy_turn(self)
+    -- If we're not done liberating the area, the enemies can take a turn!
+    if not self.is_liberated then take_enemy_turn(self) end
   end
 
   self.emote_timer = self.emote_timer - elapsed
