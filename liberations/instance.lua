@@ -205,13 +205,22 @@ local function liberate_panel(self, player_session)
       end
       player_session:complete_turn()
     else
-      if panel.custom_properties["Message"] ~= nil then
-        Async.await(player:message_with_mug(panel.custom_properties["Message"]))
-      else
-        Async.await(player:message_with_mug("Let's do it! Liberate panels!"))
-      end
-
       local enemy = self:get_enemy_at(panel.x, panel.y, panel.z)
+      if enemy then EnemyHelpers.face_position(enemy, player.x, player.y) end
+      if enemy and panel.custom_properties["Boss"] ~= nil and not enemy.is_engaged then
+        Async.await(enemy:do_first_encounter_banter(player.id))
+        if enemy.is_engaged then
+          Async.create_promise(function(resolve)
+            resolve()
+          end)
+        end
+      else
+        if panel.custom_properties["Message"] ~= nil then
+          Async.await(player:message_with_mug(panel.custom_properties["Message"]))
+        else
+          Async.await(player:message_with_mug("Let's do it! Liberate panels!"))
+        end
+      end
       local data = {
         terrain = PanelEncounters.resolve_terrain(self, player)
       }
@@ -284,7 +293,7 @@ local function take_enemy_turn(self)
           if bossPointFound then
             Net.slide_player_camera(player.id, point.x + .5, point.y + .5, point.z, slide_time)
             Async.sleep(slide_time).and_then(function()
-              player:message_with_mug("Is this the power of "..point.custom_properties["Spawns"].."...?").and_then(function()
+              player:message_with_mug("Is this the power of "..self:get_panel_at(point.x, point.y, point.z).custom_properties["Boss"].."...?").and_then(function()
                 boot_player(player, false, self.area_name)
                 Net.unlock_player_camera(player.id)
                 Net.unlock_player_input(player.id)
@@ -570,7 +579,7 @@ function Mission:new(base_area_id, new_area_id, players)
       local x = math.floor(object.x) + 1
       local y = math.floor(object.y) + 1
       local z = math.floor(object.z) + 1
-      --Panel is at [layer][x][y] basically. It's easier to read it back in code that way.
+      --Panel is at [layer][x coordinate][y coordinate] basically. It's easier to read it back in code that way.
       mission.panels[z][y][x] = new_panel
 
       -- spawning bosses
@@ -599,7 +608,7 @@ function Mission:new(base_area_id, new_area_id, players)
         local enemy = Enemy.from(mission, position, direction, name)
         new_panel.enemy = enemy
 
-        mission.enemies[#mission.enemies + 1] = enemy -- make the boss the first enemy in the list
+        mission.enemies[#mission.enemies + 1] = enemy --Append the enemy to the list
       end
     end
   end

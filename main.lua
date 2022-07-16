@@ -61,11 +61,12 @@ end
 local function detect_door_interaction(player_id, object_id, button)
 	if button ~= 0 then return end
 	local missionArea = gate_to_area_map[object_id]
+  local player_area = Net.get_player_area(player_id)
 	local player = players[player_id]
-	if missionArea ~= nil then
+	if missionArea ~= nil and player_area == missionArea[1] then
 		player:question_with_mug("Start mission?").and_then(function(response)
 		  if response == 1 then
-			  LibPlugin.start_game_for_player(player_id, missionArea)
+			  LibPlugin.start_game_for_player(player_id, missionArea[2])
 		  end
 	  end)
 	end
@@ -290,7 +291,7 @@ for i, area_id in next, areas do
     for index, value in ipairs(objects) do
       local object = Net.get_object_by_id(area_id, value)
       if object.custom_properties["Liberation Map File Name"] then
-        gate_to_area_map[value] = object.custom_properties["Liberation Map File Name"]
+        gate_to_area_map[value] = {area_id, object.custom_properties["Liberation Map File Name"]}
       end
     end
 end

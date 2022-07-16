@@ -19,7 +19,8 @@ function ShadeMan:new(instance, position, direction)
       animation_path = "/server/assets/NebuLibsAssets/mugs/shademan.animation",
     },
     encounter = "/server/assets/encounters/dependencies/com_Dawn_Shademan.zip",
-    selection = EnemySelection:new(instance)
+    selection = EnemySelection:new(instance),
+    is_engaged = false
   }
 
   setmetatable(shademan, self)
@@ -53,9 +54,17 @@ function ShadeMan:get_death_message()
   return "Grr! I can't\nbelieve I've been\ndisgraced again...!\nGyaaaahh!!"
 end
 
+function ShadeMan:do_first_encounter_banter(player_id)
+  local co = coroutine.create(function()
+    Async.await(Async.message_player(player_id, "Your deletion will be delicious!", self.mug.texture_path, self.mug.animation_path))
+    self.is_engaged = true
+  end)
+  return Async.promisify(co)
+end
+
 function ShadeMan:take_turn()
   local co = coroutine.create(function()
-    if not debug and self.instance.phase == 1 then
+    if self.instance.phase == 1 then
       for _, player in ipairs(self.instance.players) do
         player:message(
           "Heh heh...let's party!",

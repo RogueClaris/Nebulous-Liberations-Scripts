@@ -19,7 +19,8 @@ function BigBrute:new(instance, position, direction)
     y = math.floor(position.y),
     z = math.floor(position.z),
     selection = EnemySelection:new(instance),
-    encounter = "/server/assets/encounters/big_brute_encounter.zip"
+    encounter = "/server/assets/encounters/big_brute_encounter.zip",
+    is_engaged = false
   }
 
   setmetatable(bigbrute, self)

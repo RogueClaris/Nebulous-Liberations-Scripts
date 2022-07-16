@@ -21,7 +21,8 @@ function BlizzardMan:new(instance, position, direction)
       animation_path = "/server/assets/NebuLibsAssets/mugs/blizzardman.animation",
     },
     encounter = "/server/assets/encounters/big_brute_encounter.zip",
-    selection = EnemySelection:new(instance)
+    selection = EnemySelection:new(instance),
+    is_engaged = false
   }
 
   setmetatable(blizzardman, self)
@@ -38,6 +39,15 @@ function BlizzardMan:new(instance, position, direction)
   blizzardman:spawn(direction)
 
   return blizzardman
+end
+
+function BlizzardMan:do_first_encounter_banter(player_id)
+  local co = coroutine.create(function()
+    Async.await(Async.message_player(player_id, "I didn't think you would make it this far! *Whoosh*", self.mug.texture_path, self.mug.animation_path))
+    Async.await(Async.message_player(player_id, "I'll freeze you to the bone!", self.mug.texture_path, self.mug.animation_path))
+    self.is_engaged = true
+  end)
+  return Async.promisify(co)
 end
 
 function BlizzardMan:spawn(direction)
