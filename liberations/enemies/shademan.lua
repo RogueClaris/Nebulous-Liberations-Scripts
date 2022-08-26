@@ -5,12 +5,21 @@ local Direction = require("scripts/libs/direction")
 
 local ShadeMan = {}
 
-function ShadeMan:new(instance, position, direction)
+--Setup ranked health and damage
+local rank = 1
+local mob_health = {600, 1000, 1200, 1500}
+local mob_damage = {60, 90, 120, 200}
+local mob_ranks = {0, 4, 3, 0}
+
+function ShadeMan:new(instance, position, direction, local_rank)
+  if local_rank ~= nil then rank = tonumber(local_rank) end
   local shademan = {
     instance = instance,
     id = nil,
-    health = 600,
-    max_health = 600,
+    health = mob_health[rank],
+    max_health = mob_health[rank],
+    damage = mob_damage[rank],
+    rank = mob_ranks[rank],
     x = math.floor(position.x),
     y = math.floor(position.y),
     z = math.floor(position.z),
@@ -18,7 +27,7 @@ function ShadeMan:new(instance, position, direction)
       texture_path = "/server/assets/NebuLibsAssets/mugs/shademan.png",
       animation_path = "/server/assets/NebuLibsAssets/mugs/shademan.animation",
     },
-    encounter = "/server/assets/encounters/dependencies/com_Dawn_Shademan.zip",
+    encounter = "/server/assets/NebuLibsAssets/encounters/Shademan.zip",
     selection = EnemySelection:new(instance),
     is_engaged = false
   }
@@ -79,7 +88,7 @@ function ShadeMan:take_turn()
     
     local player = EnemyHelpers.find_closest_player_session(self.instance, self)
     if not player then return end --No player. Don't bother.
-    local distance = EnemyHelpers.chebyshev_tile_distance(self, player.player.x, player.player.y)
+    local distance = EnemyHelpers.chebyshev_tile_distance(self, player.player.x, player.player.y, player.player.z)
     if distance > 10 then return end --Player too far. Don't bother.
     self.selection:move(player.player, Direction.None)
     --Message all players.
@@ -102,7 +111,7 @@ function ShadeMan:take_turn()
     Async.await(EnemyHelpers.move(self.instance, self, targetx, targety, player.player.z, target_direction))
     self.selection:indicate()
     EnemyHelpers.play_attack_animation(self)
-    player:hurt(60)
+    player:hurt(self.damage)
     Async.await(Async.sleep(.7))
     Async.await(EnemyHelpers.move(self.instance, self, warp_back_pos.x, warp_back_pos.y, warp_back_pos.z, warp_back_direction))
     self.selection:remove_indicators()

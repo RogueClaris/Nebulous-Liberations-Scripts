@@ -52,6 +52,9 @@ end
 function EnemyHelpers.can_move_to(instance, x, y, z)
   local panel = instance:get_panel_at(x, y, z)
 
+  if instance:get_enemy_at(x, y, z) ~= nil then return false end --Cannot move to a tile an enemy already exists on.
+
+  --Can only move to certain tile types and if panel exists.
   return panel and (
     panel.type == "Dark Panel" or
     panel.type == "Item Panel" or
@@ -154,10 +157,12 @@ function EnemyHelpers.offset_position_with_direction(position, direction)
   return position
 end
 
-function EnemyHelpers.chebyshev_tile_distance(enemy, x, y)
+function EnemyHelpers.chebyshev_tile_distance(enemy, x, y, z)
   local xdiff = math.abs(enemy.x - math.floor(x))
   local ydiff = math.abs(enemy.y - math.floor(y))
-  return math.max(xdiff, ydiff)
+  local zdiff = math.abs(enemy.z - math.floor(z)) --Account for layer difference!
+  --Note: should enemies be able to teleport across layers??? Think on this.
+  return math.max(xdiff, ydiff, zdiff)
 end
 
 -- uses chebyshev_tile_distance
@@ -172,7 +177,7 @@ function EnemyHelpers.find_closest_player_session(instance, enemy)
       goto continue
     end
 
-    local distance = EnemyHelpers.chebyshev_tile_distance(enemy, player.x, player.y)
+    local distance = EnemyHelpers.chebyshev_tile_distance(enemy, player.x, player.y, player.z)
 
     if distance < closest_distance then
       closest_distance = distance

@@ -23,6 +23,7 @@
 local BlizzardMan = require("scripts/ezlibs-custom/nebulous-liberations/liberations/enemies/blizzardman")
 local BigBrute = require("scripts/ezlibs-custom/nebulous-liberations/liberations/enemies/bigbrute")
 local ShadeMan = require("scripts/ezlibs-custom/nebulous-liberations/liberations/enemies/shademan")
+local Bladia = require("scripts/ezlibs-custom/nebulous-liberations/liberations/enemies/bladia")
 local ExplodingEffect = require("scripts/ezlibs-custom/nebulous-liberations/utils/exploding_effect")
 
 local Enemy = {}
@@ -31,10 +32,11 @@ local name_to_enemy = {
   BlizzardMan = BlizzardMan,
   BigBrute = BigBrute,
   ShadeMan = ShadeMan,
+  Bladia = Bladia
 }
 
-function Enemy.from(instance, position, direction, name)
-  local enemy = name_to_enemy[name]:new(instance, position, direction)
+function Enemy.from(instance, position, direction, name, rank)
+  local enemy = name_to_enemy[name]:new(instance, position, direction, rank)
   enemy.name = enemy.name or name
 
   Net.set_bot_name(enemy.id, enemy.name .. ": " .. enemy.health)

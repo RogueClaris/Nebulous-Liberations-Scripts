@@ -8,18 +8,27 @@ Preloader.add_asset("/server/assets/NebuLibsAssets/bots/beast breath.animation")
 
 local BigBrute = {}
 
-function BigBrute:new(instance, position, direction)
+--Setup ranked health and damage
+local rank = 1
+local mob_health = {120, 180, 220, 250, 300, 360}
+local mob_damage = {30, 60, 90, 130, 170, 200}
+local mob_ranks = {0, 0, 0, 0, 0, 0}
+
+function BigBrute:new(instance, position, direction, local_rank)
+  if local_rank ~= nil then rank = tonumber(local_rank) end
   local bigbrute = {
     instance = instance,
     id = nil,
     battle_name = "BigBrute",
-    health = 120,
-    max_health = 120,
+    health = mob_health[rank],
+    max_health = mob_health[rank],
+    damage = mob_damage[rank],
+    rank = mob_ranks[rank],
     x = math.floor(position.x),
     y = math.floor(position.y),
     z = math.floor(position.z),
     selection = EnemySelection:new(instance),
-    encounter = "/server/assets/encounters/big_brute_encounter.zip",
+    encounter = "/server/assets/NebuLibsAssets/encounters/BigBrute.zip",
     is_engaged = false
   }
 
@@ -117,7 +126,7 @@ local function attempt_move(self)
 
     local player = closest_session.player
 
-    local distance = EnemyHelpers.chebyshev_tile_distance(self, player.x, player.y)
+    local distance = EnemyHelpers.chebyshev_tile_distance(self, player.x, player.y, player.z)
 
     if distance > 4 then
       -- too far to target
@@ -188,7 +197,7 @@ local function attempt_attack(self)
     end
 
     for _, player_session in ipairs(caught_sessions) do
-      player_session:hurt(20)
+      player_session:hurt(self.damage)
     end
 
     Async.await(Async.sleep(.5))

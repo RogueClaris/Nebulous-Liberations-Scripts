@@ -115,9 +115,9 @@ function PlayerSession:get_pass_turn_permission()
   end)
 end
 
-function PlayerSession:initiate_encounter(encounter_path, data, is_specific)
+function PlayerSession:initiate_encounter(encounter_path, data)
   return Async.create_promise(function(resolve)
-    self.player:initiate_encounter(encounter_path, data, is_specific).and_then(function(results)
+    self.player:initiate_encounter(encounter_path, data).and_then(function(results)
       local total_enemy_health = 0
       for _, enemy in ipairs(results.enemies) do
         total_enemy_health = total_enemy_health + enemy.health
@@ -268,7 +268,7 @@ function PlayerSession:find_closest_guardian()
       goto continue
     end
 
-    local distance = EnemyHelpers.chebyshev_tile_distance(enemy, self.player.x, self.player.y)
+    local distance = EnemyHelpers.chebyshev_tile_distance(enemy, self.player.x, self.player.y, self.player.z)
 
     if distance < closest_distance then
       closest_distance = distance

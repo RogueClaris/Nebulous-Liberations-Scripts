@@ -7,12 +7,21 @@ Preloader.add_asset("/server/assets/NebuLibsAssets/bots/snowball.animation")
 
 local BlizzardMan = {}
 
-function BlizzardMan:new(instance, position, direction)
+--Setup ranked health and damage
+local rank = 1
+local mob_health = {400, 1200, 1600, 2000}
+local mob_damage = {40, 80, 120, 160}
+local mob_ranks = {0, 1, 2, 3}
+
+function BlizzardMan:new(instance, position, direction, local_rank)
+  if local_rank ~= nil then rank = tonumber(local_rank) end
   local blizzardman = {
     instance = instance,
     id = nil,
-    health = 400,
-    max_health = 400,
+    health = mob_health[rank],
+    max_health = mob_health[rank],
+    damage = mob_damage[rank],
+    rank = mob_ranks[rank],
     x = math.floor(position.x),
     y = math.floor(position.y),
     z = math.floor(position.z),
@@ -20,7 +29,7 @@ function BlizzardMan:new(instance, position, direction)
       texture_path = "/server/assets/NebuLibsAssets/mugs/blizzardman.png",
       animation_path = "/server/assets/NebuLibsAssets/mugs/blizzardman.animation",
     },
-    encounter = "/server/assets/encounters/big_brute_encounter.zip",
+    encounter = "/server/assets/NebuLibsAssets/encounters/BigBrute.zip",
     selection = EnemySelection:new(instance),
     is_engaged = false
   }
@@ -86,7 +95,7 @@ function BlizzardMan:take_turn()
     self.selection:move(self, Net.get_bot_direction(self.id))
 
     local caught_sessions = self.selection:detect_player_sessions()
-    
+
     if #caught_sessions == 0 then
       return
     end
@@ -146,7 +155,7 @@ function BlizzardMan:take_turn()
     end
 
     for _, player_session in ipairs(caught_sessions) do
-      player_session:hurt(40)
+      player_session:hurt(self.damage)
     end
 
     Async.await(Async.sleep(.5))

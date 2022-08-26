@@ -178,10 +178,11 @@ local function liberate_panel(self, player_session)
       local enemy = panel.enemy -- doesn't matter if they're dead, the encounter data is valid
       local data = {
         terrain = PanelEncounters.resolve_terrain(self, player),
-        health = enemy.max_health -- spawn fully healed
+        health = enemy.max_health, -- spawn fully healed
+        rank = enemy.rank --include the rank
       }
 
-      local results = Async.await(player_session:initiate_encounter(enemy.encounter, data, true))
+      local results = Async.await(player_session:initiate_encounter(enemy.encounter, data))
 
       if not results.success then
         player_session:complete_turn()
@@ -228,13 +229,14 @@ local function liberate_panel(self, player_session)
       if enemy then
         encounter_path = enemy.encounter
         data.health = enemy.health
+        data.rank = enemy.rank
       elseif panel.custom_properties["Encounter Path"] then
         encounter_path = enemy.custom_properties["Encounter Path"]
       else
-        encounter_path = require(PanelEncounters[self.area_name])
+        encounter_path = PanelEncounters[self.area_name]
       end
 
-      local results = Async.await(player_session:initiate_encounter(encounter_path, data, enemy ~= nil))
+      local results = Async.await(player_session:initiate_encounter(encounter_path, data))
 
       if not results.success then
         if enemy then
@@ -244,7 +246,7 @@ local function liberate_panel(self, player_session)
         return
       end
 
-      if results.turns >= 1 and not results.ran then
+      if results.turns == 1 and not results.ran then
         selection:set_shape(DARK_HOLE_SHAPE, 0, -2)
       end
       -- destroy enemy
@@ -384,7 +386,8 @@ local function take_enemy_turn(self)
       -- spawn a new enemy
       local name = dark_hole.custom_properties.Spawns
       local direction = dark_hole.custom_properties.Direction
-      dark_hole.enemy = Enemy.from(self, dark_hole, direction, name)
+      local rank = dark_hole.custom_properties.Rank or 1
+      dark_hole.enemy = Enemy.from(self, dark_hole, direction, name, rank)
       self.enemies[#self.enemies+1] = dark_hole.enemy
 
       -- Let people admire the enemy
@@ -468,8 +471,7 @@ function Mission:new(base_area_id, new_area_id, players)
     needs_disposal = false,
     disposal_promise = nil,
     is_liberated = false,
-    honor_hp_mem = Net.get_area_custom_property(base_area_id, "Honor HPMem") == "true",
-    honored_hp = Net.get_area_custom_property(base_area_id, "Forced Base HP") or 100
+    honor_hp_mem = Net.get_area_custom_property(base_area_id, "Honor HPMem") == "true"
   }
   for i = 1, Net.get_layer_count(base_area_id), 1 do
     -- create a layer of panels
@@ -587,7 +589,8 @@ function Mission:new(base_area_id, new_area_id, players)
       if object.custom_properties.Boss then
         local name = object.custom_properties.Boss
         local direction = object.custom_properties.Direction
-        local enemy = Enemy.from(mission, object, direction, name)
+        local rank = object.custom_properties.Rank or 1
+        local enemy = Enemy.from(mission, object, direction, name, rank)
         enemy.is_boss = true
 
         mission.boss = enemy
@@ -598,6 +601,7 @@ function Mission:new(base_area_id, new_area_id, players)
       if object.custom_properties.Spawns then
         local name = object.custom_properties.Spawns
         local direction = object.custom_properties.Direction
+        local rank = object.custom_properties.Rank or 1
         local position = {
           x = object.x,
           y = object.y,
@@ -606,7 +610,7 @@ function Mission:new(base_area_id, new_area_id, players)
 
         position = EnemyHelpers.offset_position_with_direction(position, direction)
 
-        local enemy = Enemy.from(mission, position, direction, name)
+        local enemy = Enemy.from(mission, position, direction, name, rank)
         new_panel.enemy = enemy
 
         mission.enemies[#mission.enemies + 1] = enemy --Append the enemy to the list
@@ -650,12 +654,12 @@ function Mission:begin()
   local slide_time = .7
   local total_camera_time = 0
   local start_health = 0
-  local hp = self.honored_hp
+  local hp = 0
   for _, player in ipairs(self.players) do
     -- create data
     self.player_sessions[player.id] = PlayerSession:new(self, player)
     if self.honor_hp_mem then
-      if ezmemory.get_player_max_health(player.id) ~= nil then hp = ezmemory.get_player_max_health(player.id) end
+      hp = ezmemory.get_player_max_health(player.id)
       ezmemory.set_player_max_health(player.id, hp, self.honor_hp_mem)
       ezmemory.set_player_health(player.id, 99999)
       start_health = ezmemory.get_player_health(player.id)
